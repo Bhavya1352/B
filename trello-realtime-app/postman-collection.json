@@ -1,0 +1,207 @@
+{
+  "info": {
+    "name": "Trello Real-time API Collection",
+    "description": "Test collection for all four required API endpoints",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3001/api"
+    },
+    {
+      "key": "boardId",
+      "value": "{{boardId}}"
+    },
+    {
+      "key": "listId",
+      "value": "{{listId}}"
+    },
+    {
+      "key": "cardId",
+      "value": "{{cardId}}"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Create Board",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 201', function () {",
+              "    pm.response.to.have.status(201);",
+              "});",
+              "",
+              "pm.test('Board created successfully', function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.have.property('id');",
+              "    pm.expect(jsonData).to.have.property('name');",
+              "    pm.collectionVariables.set('boardId', jsonData.id);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Internship Test Board\",\n  \"defaultLists\": true\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/boards",
+          "host": ["{{baseUrl}}"],
+          "path": ["boards"]
+        }
+      }
+    },
+    {
+      "name": "2. Add Task (Create Card)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 201', function () {",
+              "    pm.response.to.have.status(201);",
+              "});",
+              "",
+              "pm.test('Card created successfully', function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.have.property('id');",
+              "    pm.expect(jsonData).to.have.property('name');",
+              "    pm.collectionVariables.set('cardId', jsonData.id);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"boardId\": \"{{boardId}}\",\n  \"listId\": \"{{listId}}\",\n  \"name\": \"Sample Task\",\n  \"desc\": \"This is a test task created via API\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/tasks",
+          "host": ["{{baseUrl}}"],
+          "path": ["tasks"]
+        }
+      }
+    },
+    {
+      "name": "3. Update Task (Update Card)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test('Card updated successfully', function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.have.property('id');",
+              "    pm.expect(jsonData.name).to.eql('Updated Task Title');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Updated Task Title\",\n  \"desc\": \"This task has been updated via API\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/tasks/{{cardId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["tasks", "{{cardId}}"]
+        }
+      }
+    },
+    {
+      "name": "4. Delete Task (Delete Card)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test('Card deleted successfully', function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.have.property('message');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/tasks/{{cardId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["tasks", "{{cardId}}"]
+        }
+      }
+    },
+    {
+      "name": "Get Board (Helper)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test('Board data retrieved', function () {",
+              "    var jsonData = pm.response.json();",
+              "    pm.expect(jsonData).to.have.property('lists');",
+              "    if (jsonData.lists && jsonData.lists.length > 0) {",
+              "        pm.collectionVariables.set('listId', jsonData.lists[0].id);",
+              "    }",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/boards/{{boardId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["boards", "{{boardId}}"]
+        }
+      }
+    }
+  ]
+}
